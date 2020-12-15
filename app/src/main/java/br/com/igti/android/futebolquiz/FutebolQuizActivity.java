@@ -3,6 +3,7 @@ package br.com.igti.android.futebolquiz;
 import android.animation.Animator;
 import android.app.Activity;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.widget.CardView;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +19,9 @@ import android.widget.Toast;
 public class FutebolQuizActivity extends Activity {
 
     private static final String TAG = "FutebolQuizActivity";
+
+    private static final String PREF_PRIMEIRA_VEZ = "primeiraVez";
+    private static AudioPlayer audio = new AudioPlayer();
 
     private static final String KEY_INDICE = "indice";
 
@@ -80,8 +84,10 @@ public class FutebolQuizActivity extends Activity {
 
         if (botaoPressionado == resposta) {
             recursoRespostaId = R.string.toast_acertou;
+            audio.play(FutebolQuizActivity.this, R.raw.cashregister);
         } else {
             recursoRespostaId = R.string.toast_errou;
+            audio.play(FutebolQuizActivity.this, R.raw.buzzer);
         }
 
         Toast.makeText(this, recursoRespostaId, Toast.LENGTH_SHORT).show();
@@ -124,11 +130,6 @@ public class FutebolQuizActivity extends Activity {
         Log.d(TAG,"onStart()");
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.d(TAG,"onResume()");
-    }
 
     @Override
     protected void onPause() {
@@ -169,4 +170,21 @@ public class FutebolQuizActivity extends Activity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        Log.d(TAG,"onResume()");
+
+        boolean primeiraVez = PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean(PREF_PRIMEIRA_VEZ,true);
+
+        if (primeiraVez) {
+            PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+                    .edit()
+                    .putBoolean(PREF_PRIMEIRA_VEZ,false)
+                    .commit();
+            Toast.makeText(this, "Bem-vindo ao FutebolQuiz!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
 }
